@@ -1,11 +1,12 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    kotlin("plugin.serialization") version "2.1.10"
 }
 
 android {
     namespace = "com.example.weatherwise"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.weatherwise"
@@ -66,4 +67,21 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // nav
+    val nav_version = "2.8.8"
+    implementation("androidx.navigation:navigation-compose:$nav_version")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json: 1.8.0")
+
+    // lottie
+    implementation("com.airbnb.android:lottie-compose:5.2.0")
+
+    //constraint
+    implementation ("androidx.constraintlayout:constraintlayout-compose:1.1.1")
+
+    //Scoped API
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose-android:2.8.7")
+    //Retrofit
+    implementation ("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.11.0")
 }
