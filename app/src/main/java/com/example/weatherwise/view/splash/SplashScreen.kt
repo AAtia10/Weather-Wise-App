@@ -22,11 +22,11 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun AppEntryPoint() {
-    var showSplash by remember { mutableIntStateOf(1) } // 1 = Show Splash, 0 = Show MainScreen
+    var showSplash by remember { mutableIntStateOf(1) }
 
     LaunchedEffect(Unit) {
-        delay(3000) // Show splash for 3 seconds
-        showSplash = 0 // Switch to MainScreen
+        delay(3000)
+        showSplash = 0
     }
 
     if (showSplash == 1) {

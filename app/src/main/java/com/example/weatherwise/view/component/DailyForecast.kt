@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Constraints
@@ -35,6 +36,7 @@ import com.example.weatherwise.ui.theme.ColorGradient3
 import com.example.weatherwise.ui.theme.ColorTextSecondary
 import com.example.weatherwise.ui.theme.ColorTextSecondaryVariant
 import com.example.weatherwise.ui.theme.ColorWindForecast
+import com.example.weatherwise.view.util.formatNumberBasedOnLanguage
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -76,7 +78,7 @@ fun DailyForecast(
                 }
             )
         
-        Text(text = weather?.weather?.firstOrNull()?.main ?: "Unknown",
+        Text(text =  formatNumberBasedOnLanguage(weather?.weather?.firstOrNull()?.main?:""),
             style = MaterialTheme.typography.titleLarge,
             color = ColorTextSecondary,
             fontWeight = FontWeight.Medium,
@@ -109,17 +111,12 @@ fun DailyForecast(
             top.linkTo(anchor = forecastImage.top)
             bottom.linkTo(anchor = forecastImage.bottom)
         },
-            degree = weather?.main?.temp?.toInt()?.toString() ?: "N/A",
-            description = "Feels like ${weather?.main?.feels_like?.toInt() ?: "N/A"}°"
+            degree = formatNumberBasedOnLanguage( weather?.main?.temp?.toInt()?.toString() ?:"N/A") ,
+            description = stringResource(
+                R.string.feels_like,
+                weather?.main?.feels_like?.toInt() ?: "N/A"
+            )
         )
-
-//        WindForecast(modifier=Modifier.constrainAs(windImage){
-//            linkTo(
-//                top = title.top,
-//                bottom = title.bottom
-//            )
-//            end.linkTo(anchor = parent.end, margin = 24.dp)
-//        })
 
 
 
@@ -155,7 +152,7 @@ private fun ForeCastValue(
 
 
             Text(
-                text = degree,
+                text = formatNumberBasedOnLanguage(degree),
                 style = TextStyle(
                     brush = Brush.linearGradient(
                         0f to Color.White,
@@ -193,20 +190,3 @@ private fun ForeCastValue(
 
 }
 
-//@Composable
-//private fun WindForecast(modifier: Modifier=Modifier)
-//{
-//    Row(modifier=modifier,
-//        verticalAlignment = Alignment.CenterVertically
-//        ) {
-//        Icon(painter = painterResource(R.drawable.ic_frosty), contentDescription = null,modifier=Modifier.size(60.dp),
-//            tint = ColorWindForecast
-//            )
-//
-//        Icon(painter = painterResource(R.drawable.ic_wind), contentDescription = null,modifier=Modifier.size(60.dp),
-//            tint = ColorWindForecast
-//        )
-//
-//
-//    }
-//}

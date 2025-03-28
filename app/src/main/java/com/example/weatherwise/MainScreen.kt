@@ -20,6 +20,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.rememberNavController
 import com.example.weatherwise.NavItem
 import com.example.weatherwise.view.Alert.AlertScreen
@@ -31,10 +32,10 @@ import com.example.weatherwise.view.settings.SettingsScreen
 @Composable
 fun MainScreen() {
     val navListItem = listOf(
-        NavItem("Home", Icons.Default.Home),
-        NavItem("Alert", Icons.Default.Notifications),
-        NavItem("Favourite", Icons.Default.Favorite),
-        NavItem("Settings", Icons.Default.Settings)
+        NavItem(stringResource(R.string.home), Icons.Default.Home),
+        NavItem(stringResource(R.string.alert), Icons.Default.Notifications),
+        NavItem(stringResource(R.string.favourite), Icons.Default.Favorite),
+        NavItem(stringResource(R.string.settings), Icons.Default.Settings)
     )
 
     val navController = rememberNavController()
@@ -70,7 +71,10 @@ fun MainScreen() {
             }
         }
     ) { innerPadding ->
-        Box(Modifier.fillMaxSize().padding(innerPadding))
+        Box(
+            Modifier
+                .fillMaxSize()
+                .padding(innerPadding))
         {
             SetupNavHost(navController = navController)
         }

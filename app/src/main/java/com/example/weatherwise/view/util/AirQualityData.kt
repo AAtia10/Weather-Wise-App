@@ -2,17 +2,14 @@ package com.example.weatherwise.view.util
 
 
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import com.example.weatherwise.R
 
 data class AirQualityItem(
     @DrawableRes val icon: Int,
-    val title: String,
+    @StringRes val title: Int, // Now using string resource ID
     val value: String
 )
-
-
-
-
 
 fun getAirQualityList(
     feelsLike:String,
@@ -26,34 +23,34 @@ fun getAirQualityList(
 
     return  listOf(
         AirQualityItem(
-            title = "Real Feel",
+            title = R.string.real_feel,
             value = feelsLike,
             icon = R.drawable.ic_real_feel
         ),
         AirQualityItem(
-            title = "Sun Set",
+            title = R.string.sun_set,
             value = sunset,
-            icon = R.drawable.ic_wind_quality,
+            icon = R.drawable.sunset,
         ),
         AirQualityItem(
-            title = "Sun Rise",
+            title = R.string.sun_rise,
             value = sunrise,
-            icon = R.drawable.baseline_visibility_24
+            icon = R.drawable.sunrise
         ),
         AirQualityItem(
-            title = "Wind",
+            title = R.string.wind,
             value = windSpeed,
-            icon = R.drawable.ic_rain_chance
+            icon = R.drawable.wind
         ),
         AirQualityItem(
-            title = "humidity",
+            title = R.string.humidity,
             value = humditiy,
-            icon = R.drawable.ic_uv_index
+            icon = R.drawable.hum
         ),
         AirQualityItem(
-            title = "pressure",
+            title = R.string.pressure,
             value = pressure,
-            icon = R.drawable.ic_o3
+            icon = R.drawable.pressure
         )
     )
 }

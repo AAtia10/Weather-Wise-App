@@ -22,22 +22,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.weatherwise.R
-import com.example.weatherwise.ui.theme.ColorGradient1
-import com.example.weatherwise.ui.theme.ColorGradient2
-import com.example.weatherwise.ui.theme.ColorGradient3
-import com.example.weatherwise.ui.theme.ColorTextAction
 import com.example.weatherwise.ui.theme.ColorTextPrimary
 import com.example.weatherwise.ui.theme.ColorTextPrimaryVariant
 import com.example.weatherwise.ui.theme.ColorTextSecondary
@@ -55,7 +51,6 @@ fun WeeklyForecast(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         WeatherForecastHeader()
-        val limitedData = data.take(4)
 
         LazyRow(
             modifier = Modifier.fillMaxWidth(),
@@ -65,9 +60,7 @@ fun WeeklyForecast(
                 items = data,
                 key = { it.dayOfWeek }
             ) { item ->
-                Forecast(
-                    item = item.copy(isSelected = item == limitedData.first())
-                )
+                Forecast(item = item)
             }
         }
     }
@@ -83,68 +76,22 @@ private fun WeatherForecastHeader(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = "Weekly forecast",
+            text = stringResource(R.string.weekly_forecast),
             style = MaterialTheme.typography.titleLarge,
             color = ColorTextPrimary,
             fontWeight = FontWeight.Bold,
             fontSize = 20.sp
         )
-
     }
 }
-
-
-
 
 @Composable
 private fun Forecast(
     modifier: Modifier = Modifier,
     item: ForecastItem
 ) {
-    val updatedModifier = remember(item.isSelected) {
-        if (item.isSelected) {
-            modifier.background(
-                shape = RoundedCornerShape(percent = 50),
-                brush = Brush.linearGradient(
-                    0f to ColorGradient1,
-                    0.5f to ColorGradient2,
-                    1f to ColorGradient3
-                )
-            )
-        } else {
-            modifier
-        }
-    }
-
-    val primaryTextColor = remember(item.isSelected) {
-        if (item.isSelected) ColorTextSecondary else ColorTextPrimary
-    }
-
-    val secondaryTextColor = remember(item.isSelected) {
-        if (item.isSelected) ColorTextSecondaryVariant else ColorTextPrimaryVariant
-    }
-
-    val temperatureTextStyle = remember(item.isSelected) {
-        if (item.isSelected) {
-            TextStyle(
-                brush = Brush.verticalGradient(
-                    0f to Color.White,
-                    1f to Color.White.copy(alpha = 0.3f)
-                ),
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Black
-            )
-        } else {
-            TextStyle(
-                color = ColorTextPrimary,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Black
-            )
-        }
-    }
-
     Column(
-        modifier = updatedModifier
+        modifier = modifier
             .width(65.dp)
             .padding(
                 horizontal = 10.dp,
@@ -155,12 +102,12 @@ private fun Forecast(
         Text(
             text = item.dayOfWeek,
             style = MaterialTheme.typography.labelLarge,
-            color = primaryTextColor
+            color = ColorTextPrimary
         )
         Text(
             text = item.date,
             style = MaterialTheme.typography.labelMedium,
-            color = secondaryTextColor,
+            color = ColorTextPrimaryVariant,
             fontWeight = FontWeight.Normal
         )
         Spacer(
@@ -175,7 +122,11 @@ private fun Forecast(
         Text(
             text = item.temperature,
             letterSpacing = 0.sp,
-            style = temperatureTextStyle,
+            style = TextStyle(
+                color = ColorTextPrimary,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Black
+            ),
         )
         Spacer(
             modifier = Modifier.height(8.dp)

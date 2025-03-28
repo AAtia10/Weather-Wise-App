@@ -35,7 +35,9 @@ fun SetupNavHost(  navController:NavHostController)
             AlertScreen()
         }
         composable<ScreenRoutes.MapScreen>{
-            MapScreen()
+            MapScreen(){
+                navController.navigate(ScreenRoutes.FavouriteScreen)
+            }
         }
 
 

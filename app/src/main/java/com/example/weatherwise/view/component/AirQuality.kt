@@ -23,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.weatherwise.R
@@ -30,6 +31,7 @@ import com.example.weatherwise.ui.theme.ColorAirQualityIconTitle
 import com.example.weatherwise.ui.theme.ColorSurface
 import com.example.weatherwise.ui.theme.ColorTextPrimary
 import com.example.weatherwise.ui.theme.ColorTextPrimaryVariant
+import com.example.weatherwise.view.util.formatNumberBasedOnLanguage
 
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -89,7 +91,7 @@ private fun AirQualityHeader(
                 tint = ColorAirQualityIconTitle
             )
             Text(
-                text = "Air Quality",
+                text = stringResource(R.string.air_quality),
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontSize = 18.sp
                 )
@@ -121,12 +123,12 @@ private fun AirQualityInfo(
             horizontalAlignment = Alignment.Start
         ) {
             Text(
-                text = data.title,
+                text = stringResource(id = data.title),
                 style = MaterialTheme.typography.labelSmall,
                 color = ColorTextPrimaryVariant
             )
             Text(
-                text = data.value,
+                text = formatNumberBasedOnLanguage(data.value),
                 style = MaterialTheme.typography.labelSmall,
                 color = ColorTextPrimary
             )

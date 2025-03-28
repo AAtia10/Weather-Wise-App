@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.weatherwise.R
@@ -28,6 +29,7 @@ import com.example.weatherwise.ui.theme.ColorGradient1
 import com.example.weatherwise.ui.theme.ColorGradient2
 import com.example.weatherwise.ui.theme.ColorGradient3
 import com.example.weatherwise.ui.theme.ColorTextSecondary
+import com.example.weatherwise.view.util.formatNumberBasedOnLanguage
 
 @Composable
 fun ActionBar(
@@ -74,7 +76,7 @@ private fun LocationInfo(
                 contentScale = ContentScale.FillHeight
             )
             Text(
-                text = weather?.name ?: "Loading...",
+                text = weather?.name ?: stringResource(R.string.loading),
                 style = MaterialTheme.typography.titleLarge,
                 color = Color.Blue,
                 fontWeight = FontWeight.Bold
@@ -106,7 +108,7 @@ private fun ProgressBar(
             )
     ) {
         Text(
-            text = "Temp: $temperature°C",
+            text = stringResource(R.string.temp) +"${  formatNumberBasedOnLanguage(temperature.toString())}°C",
             style = MaterialTheme.typography.labelSmall,
             color = ColorTextSecondary.copy(alpha = 0.7f)
         )

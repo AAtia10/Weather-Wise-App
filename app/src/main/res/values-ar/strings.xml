@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">طقس وايز</string>
+    <string name="loading">جارٍ التحميل...</string>
+    <string name="temp">"درجة الحرارة: "</string>
+    <string name="air_quality">جودة الهواء</string>
+    <string name="real_feel">الشعور الحقيقي</string>
+    <string name="sun_set">غروب الشمس</string>
+    <string name="sun_rise">شروق الشمس</string>
+    <string name="wind">الرياح</string>
+    <string name="humidity">الرطوبة</string>
+    <string name="pressure">الضغط</string>
+    <string name="unknown">غير معروف</string>
+    <string name="feels_like">يشعر كأنه %1$s°</string>
+    <string name="location">الموقع</string>
+    <string name="hourly_forecast">توقعات ساعية</string>
+    <string name="location_inserted_successfully">تم إدراج الموقع بنجاح</string>
+    <string name="search_location">ابحث عن موقع</string>
+    <string name="selected_location">الموقع المحدد</string>
+    <string name="select_location">اختر الموقع</string>
+    <string name="location_not_found">لم يتم العثور على الموقع</string>
+    <string name="error_retrieving_location_details">خطأ في استرجاع تفاصيل الموقع</string>
+    <string name="settings">الإعدادات</string>
+    <string name="temperature">درجة الحرارة</string>
+    <string name="wind_speed">سرعة الرياح</string>
+    <string name="language">اللغة</string>
+    <string name="english">English</string>
+    <string name="arabic">العربية</string>
+    <string name="n">الموقع</string>
+    <string name="map">الخريطة</string>
+    <string name="gps">نظام تحديد المواقع</string>
+    <string name="weekly_forecast">التوقعات الأسبوعية</string>
+    <string name="home">الرئيسية</string>
+    <string name="alert">تنبيه</string>
+    <string name="favourite">المفضلة</string>
+    <string name="c">°م</string>
+    <string name="f">°ف</string>
+    <string name="k">°ك</string>
+    <string name="meter_s">متر/ث</string>
+    <string name="mile_h">ميل/س</string>
+</resources>

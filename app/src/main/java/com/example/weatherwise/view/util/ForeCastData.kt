@@ -10,7 +10,7 @@ data class ForecastItem(
     val temperature: String,
     val airQuality: String,
     val airQualityIndicatorColorHex: String,
-    val isSelected: Boolean = false
+
 )
 
 val ForecastData = listOf(
@@ -29,7 +29,7 @@ val ForecastData = listOf(
         temperature = "18°",
         airQuality = "160",
         airQualityIndicatorColorHex = "#ff7676",
-        isSelected = true
+
     ),
     ForecastItem(
         image = R.drawable.img_thunder,
