@@ -41,24 +41,25 @@ import java.util.Locale
 
 @Composable
 fun HomeScreen() {
-    val context = LocalContext.current
-
     val homeViewModel: HomeViewModel = viewModel(
         factory = HomeFactory(
             WeatherRepositoryImpl.getInstance(
                 RemoteDataSourceImpl(Retrofit.service),
-                LocalDataSource.getInstance(WeatherDatabase.getInstance(context).favoriteDao()),
-                SharedPrefrence.getInstance(context)
+                LocalDataSource.getInstance(WeatherDatabase.getInstance(LocalContext.current).favoriteDao()),
+                SharedPrefrence.getInstance(LocalContext.current)
             )
         )
     )
 
+    val isConnected by homeViewModel.isConnected.collectAsStateWithLifecycle()
     val weather by homeViewModel.weatherData.collectAsStateWithLifecycle()
     val forecast by homeViewModel.forecastData.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        homeViewModel.fetchWeather(31.12, 29.57)
-        homeViewModel.fetchForecast(31.12, 29.57)
+    LaunchedEffect(isConnected) {
+        if (isConnected) {
+            homeViewModel.fetchWeather(31.12, 29.57)
+            homeViewModel.fetchForecast(31.12, 29.57)
+        }
     }
 
     Scaffold(modifier = Modifier.fillMaxSize()) { paddings ->
@@ -69,34 +70,34 @@ fun HomeScreen() {
                 .padding(paddings)
                 .padding(horizontal = 24.dp, vertical = 10.dp)
         ) {
-            if (weather == null || forecast == null) {
-                // Show Lottie animation while loading
-                LoadingAnimation()
-            } else {
-                // Show actual weather data when available
-                weather?.let { weather ->
-                    val feelsLike = "${weather.main.feels_like.toInt()} °C"
-                    val humidity = "${weather.main.humidity} %"
-                    val pressure = "${weather.main.pressure} hpa"
-                    val speed = "${weather.wind.speed} m/s"
-                    val sunrise = formatTime(weather.sys.sunrise.toLong())
-                    val sunset = formatTime(weather.sys.sunset.toLong())
+            when {
+                !isConnected -> NoInternetAnimation()
+                weather == null || forecast == null -> LoadingAnimation()
+                else -> {
+                    weather?.let { weather ->
+                        val feelsLike = "${weather.main.feels_like.toInt()} °C"
+                        val humidity = "${weather.main.humidity} %"
+                        val pressure = "${weather.main.pressure} hpa"
+                        val speed = "${weather.wind.speed} m/s"
+                        val sunrise = formatTime(weather.sys.sunrise.toLong())
+                        val sunset = formatTime(weather.sys.sunset.toLong())
 
-                    val airList = getAirQualityList(feelsLike, speed, pressure, humidity, sunrise, sunset)
+                        val airList = getAirQualityList(feelsLike, speed, pressure, humidity, sunrise, sunset)
 
-                    ActionBar(weather)
-                    Spacer(modifier = Modifier.height(12.dp))
-                    DailyForecast(weather)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    AirQuality(data = airList)
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    forecast?.let {
-                        val list = it.list.subList(0, 8)
-                        HourlyForecast(list = getHourlyForecastData(list))
+                        ActionBar(weather)
+                        Spacer(modifier = Modifier.height(12.dp))
+                        DailyForecast(weather)
+                        Spacer(modifier = Modifier.height(16.dp))
+                        AirQuality(data = airList)
                         Spacer(modifier = Modifier.height(24.dp))
-                        WeeklyForecast()
-                        Spacer(modifier = Modifier.height(150.dp))
+
+                        forecast?.let {
+                            val list = it.list.subList(0, 8)
+                            HourlyForecast(list = getHourlyForecastData(list))
+                            Spacer(modifier = Modifier.height(24.dp))
+                            WeeklyForecast()
+                            Spacer(modifier = Modifier.height(150.dp))
+                        }
                     }
                 }
             }
@@ -112,6 +113,25 @@ fun LoadingAnimation() {
     Column(
         modifier = Modifier
             .fillMaxSize(),
+        horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally,
+        verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
+    ) {
+        LottieAnimation(
+            composition = composition,
+            progress = { progress },
+            modifier = Modifier.fillMaxSize(0.5f)
+        )
+    }
+}
+
+
+@Composable
+fun NoInternetAnimation() {
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.internet))
+    val progress by animateLottieCompositionAsState(composition)
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
         horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally,
         verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
     ) {

@@ -1,42 +1,18 @@
 package com.example.weatherwise.view.favourite
 
+import android.os.Bundle
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FabPosition
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SwipeToDismiss
-import androidx.compose.material3.SwipeToDismissBoxValue
-import androidx.compose.material3.Text
-import androidx.compose.material3.rememberSwipeToDismissBoxState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,11 +24,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.weatherwise.R
+import com.example.weatherwise.ScreenRoutes
 import com.example.weatherwise.data.local.LocalDataSource
 import com.example.weatherwise.data.local.WeatherDatabase
 import com.example.weatherwise.data.local.sharedPrefrence.SharedPrefrence
@@ -64,9 +42,9 @@ import com.example.weatherwise.view.util.formatNumberBasedOnLanguage
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-
 @Composable
 fun FavouriteScreen(
+    navController: NavController,
     onAddClick: () -> Unit
 ) {
     val context = LocalContext.current
@@ -75,12 +53,11 @@ fun FavouriteScreen(
 
     val favoriteViewModel: FavoriteViewModel = viewModel(
         factory = FavoriteViewModelFactory(
-            WeatherRepositoryImpl
-                .getInstance(
-                    RemoteDataSourceImpl(Retrofit.service),
-                    LocalDataSource.getInstance(WeatherDatabase.getInstance(context).favoriteDao()),
-                    SharedPrefrence.getInstance(context)
-                )
+            WeatherRepositoryImpl.getInstance(
+                RemoteDataSourceImpl(Retrofit.service),
+                LocalDataSource.getInstance(WeatherDatabase.getInstance(context).favoriteDao()),
+                SharedPrefrence.getInstance(context)
+            )
         )
     )
     val favouriteList by favoriteViewModel.favorites.collectAsStateWithLifecycle()
@@ -119,6 +96,13 @@ fun FavouriteScreen(
                         coroutineScope.launch {
                             favoriteViewModel.deleteFavoriteWithUndo(place, snackbarHostState)
                         }
+                    },
+                    onItemClick = { place ->
+                        navController.navigate(
+                            ScreenRoutes.FavouriteDetailScreen.createRoute(place.id)
+                        ) {
+                            launchSingleTop = true
+                        }
                     }
                 )
             }
@@ -137,9 +121,11 @@ fun FavouriteScreen(
     }
 }
 
-
 @Composable
-fun FavoritePlaceCard(place: WeatherResult) {
+fun FavoritePlaceCard(
+    place: WeatherResult,
+    onClick: () -> Unit
+) {
     val weatherIcon = getWeatherIcon(place)
 
     Card(
@@ -148,13 +134,13 @@ fun FavoritePlaceCard(place: WeatherResult) {
             .padding(8.dp),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+        onClick = onClick
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-
             Image(
                 painter = painterResource(id = weatherIcon),
                 contentDescription = "Weather Icon",
@@ -172,7 +158,7 @@ fun FavoritePlaceCard(place: WeatherResult) {
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text =  "${formatNumberBasedOnLanguage(place.main.temp.toInt().toString())}°C",
+                    text = "${formatNumberBasedOnLanguage(place.main.temp.toInt().toString())}°C",
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
@@ -182,14 +168,18 @@ fun FavoritePlaceCard(place: WeatherResult) {
     }
 }
 
-
 @Composable
-fun FavoritePlacesList(favoriteList: List<WeatherResult>, onRemove: (WeatherResult) -> Unit) {
+fun FavoritePlacesList(
+    favoriteList: List<WeatherResult>,
+    onRemove: (WeatherResult) -> Unit,
+    onItemClick: (WeatherResult) -> Unit
+) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         items(favoriteList, key = { it.id }) { place ->
             SwipeToDismissBox(
                 item = place,
-                onRemove = { onRemove(place) }
+                onRemove = { onRemove(place) },
+                onClick = { onItemClick(place) }
             )
         }
     }
@@ -199,14 +189,15 @@ fun FavoritePlacesList(favoriteList: List<WeatherResult>, onRemove: (WeatherResu
 @Composable
 fun SwipeToDismissBox(
     item: WeatherResult,
-    onRemove: () -> Unit
+    onRemove: () -> Unit,
+    onClick: () -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
     val swipeToDismissState = rememberSwipeToDismissBoxState(
         confirmValueChange = { state ->
             if (state == SwipeToDismissBoxValue.EndToStart) {
                 coroutineScope.launch {
-                    delay(1000) // Wait for 1 second before removing
+                    delay(1000)
                     onRemove()
                 }
                 true
@@ -232,11 +223,15 @@ fun SwipeToDismissBox(
                     .fillMaxSize()
                     .background(backgroundColor)
             )
-        }, dismissContent = {FavoritePlaceCard(item)}
+        },
+        dismissContent = {
+            FavoritePlaceCard(
+                item,
+                onClick = onClick
+            )
+        }
     )
-
 }
-
 
 @Composable
 fun getWeatherIcon(weather: WeatherResult?): Int {
@@ -245,8 +240,6 @@ fun getWeatherIcon(weather: WeatherResult?): Int {
         "Clouds" -> R.drawable.img_cloudy
         "Rain" -> R.drawable.img_rain
         "Snow" -> R.drawable.img_snow
-        else -> R.drawable.img_sub_rain // Default fallback icon
+        else -> R.drawable.img_sub_rain
     }
 }
-
-

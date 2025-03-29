@@ -8,12 +8,14 @@ import com.example.weatherwise.data.SharedKeys
 import com.example.weatherwise.data.local.sharedPrefrence.SharedPrefrence
 import com.example.weatherwise.ui.theme.WeatherWiseTheme
 import com.example.weatherwise.view.splash.AppEntryPoint
+import com.example.weatherwise.view.util.ConnectivityObserver
 import com.example.weatherwise.view.util.getLanguage
 import java.util.Locale
 
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        ConnectivityObserver.initialize(this)
         super.onCreate(savedInstanceState)
         val sharedPref = SharedPrefrence.getInstance(this)
         val lang = getLanguage(
