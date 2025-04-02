@@ -29,6 +29,8 @@ import com.example.weatherwise.data.repo.WeatherRepositoryImpl
 import com.example.weatherwise.view.component.*
 import com.example.weatherwise.view.home.formatTime
 import com.example.weatherwise.view.util.getAirQualityList
+import com.example.weatherwise.view.util.getFirstForecastPerDay
+import com.example.weatherwise.view.util.getForecastData
 import com.example.weatherwise.view.util.getHourlyForecastData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -124,9 +126,10 @@ fun FavouriteDetailScreen(
 
                         forecast?.let {
                             val list = it.list.subList(0, 8)
+                             val foreCastList=it.list.getFirstForecastPerDay()
                             HourlyForecast(list = getHourlyForecastData(list))
                             Spacer(modifier = Modifier.height(24.dp))
-                            WeeklyForecast()
+                            WeeklyForecast(data= getForecastData(foreCastList))
                             Spacer(modifier = Modifier.height(150.dp))
                         }
                     }

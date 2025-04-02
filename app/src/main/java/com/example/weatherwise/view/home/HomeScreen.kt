@@ -1,6 +1,5 @@
 package com.example.weatherwise.view.home
 
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,6 +33,8 @@ import com.example.weatherwise.view.component.DailyForecast
 import com.example.weatherwise.view.component.HourlyForecast
 import com.example.weatherwise.view.component.WeeklyForecast
 import com.example.weatherwise.view.util.getAirQualityList
+import com.example.weatherwise.view.util.getFirstForecastPerDay
+import com.example.weatherwise.view.util.getForecastData
 import com.example.weatherwise.view.util.getHourlyForecastData
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -45,7 +46,9 @@ fun HomeScreen() {
         factory = HomeFactory(
             WeatherRepositoryImpl.getInstance(
                 RemoteDataSourceImpl(Retrofit.service),
-                LocalDataSource.getInstance(WeatherDatabase.getInstance(LocalContext.current).favoriteDao()),
+                LocalDataSource.getInstance(
+                    WeatherDatabase.getInstance(LocalContext.current).favoriteDao()
+                ),
                 SharedPrefrence.getInstance(LocalContext.current)
             )
         )
@@ -57,8 +60,15 @@ fun HomeScreen() {
 
     LaunchedEffect(isConnected) {
         if (isConnected) {
-            homeViewModel.fetchWeather(31.12, 29.57)
-            homeViewModel.fetchForecast(31.12, 29.57)
+
+            homeViewModel.fetchWeather()
+            homeViewModel.fetchForecast()
+        }
+        else
+        {
+            homeViewModel.fetchLocalWeather()
+            homeViewModel.fetchLocalForecast()
+
         }
     }
 
@@ -71,7 +81,7 @@ fun HomeScreen() {
                 .padding(horizontal = 24.dp, vertical = 10.dp)
         ) {
             when {
-                !isConnected -> NoInternetAnimation()
+                //!isConnected -> NoInternetAnimation()
                 weather == null || forecast == null -> LoadingAnimation()
                 else -> {
                     weather?.let { weather ->
@@ -93,9 +103,10 @@ fun HomeScreen() {
 
                         forecast?.let {
                             val list = it.list.subList(0, 8)
+                            val foreCastList=it.list.getFirstForecastPerDay()
                             HourlyForecast(list = getHourlyForecastData(list))
                             Spacer(modifier = Modifier.height(24.dp))
-                            WeeklyForecast()
+                            WeeklyForecast(data=getForecastData(foreCastList))
                             Spacer(modifier = Modifier.height(150.dp))
                         }
                     }

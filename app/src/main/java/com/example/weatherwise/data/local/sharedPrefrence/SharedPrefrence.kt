@@ -30,6 +30,7 @@ class SharedPrefrence(context: Context) {
                 is Boolean -> putBoolean(key, value)
                 is Float -> putFloat(key, value)
                 is Long -> putLong(key, value)
+                is Double->putFloat(key,value.toFloat())
                 else -> throw IllegalArgumentException("Unsupported type")
             }
             apply()
@@ -43,6 +44,7 @@ class SharedPrefrence(context: Context) {
             is Boolean -> sharedPreferences.getBoolean(key, defaultValue) as T
             is Float -> sharedPreferences.getFloat(key, defaultValue) as T
             is Long -> sharedPreferences.getLong(key, defaultValue) as T
+            is Double->sharedPreferences.getFloat(key,defaultValue.toFloat()).toDouble() as T
             else -> throw IllegalArgumentException("Unsupported type")
         }
     }

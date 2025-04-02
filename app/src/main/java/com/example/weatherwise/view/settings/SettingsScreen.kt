@@ -1,6 +1,15 @@
 package com.example.weatherwise.view.settings
 
+import android.Manifest
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.location.LocationManager
+import android.provider.Settings
 import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -15,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.weatherwise.R
 import com.example.weatherwise.data.SharedKeys
@@ -27,15 +37,15 @@ import com.example.weatherwise.data.repo.WeatherRepositoryImpl
 import com.example.weatherwise.view.home.HomeFactory
 import com.example.weatherwise.view.util.getArabicTemperatureDisplayUnit
 import com.example.weatherwise.view.util.getArabicWindUnit
+import com.example.weatherwise.view.util.getGpsLocation
 import com.example.weatherwise.view.util.getTemperatureDisplayUnit
 import com.example.weatherwise.view.util.getTemperatureUnit
 import com.example.weatherwise.view.util.getWindDisplayUnit
 import com.example.weatherwise.view.util.restartActivity
 
 @Composable
-fun SettingsScreen() {
-
-    val context= LocalContext.current
+fun SettingsScreen(onMapClicked:()->Unit) {
+    val context = LocalContext.current
     val viewModel:SettingsViewModel=  viewModel(
         factory = SettingsFactory(
             WeatherRepositoryImpl.getInstance(
@@ -45,6 +55,31 @@ fun SettingsScreen() {
             )
         )
     )
+
+    val permission = Manifest.permission.ACCESS_FINE_LOCATION
+    val permissionState = remember { mutableStateOf(
+        ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+    )}
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        permissionState.value = isGranted
+        if (isGranted) {
+            if (isLocationEnabled(context))
+            {
+                context.getGpsLocation { viewModel.saveGpsLocation(it) }
+            }
+            else
+            {
+                openLocationSettings(context)
+            }
+
+        } else {
+            Toast.makeText(context, "Location Permission Denied", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     var selectedLanguage by remember { mutableStateOf(viewModel.fetchData(SharedKeys.LANGUAGE.toString(),"English")) }
     var selectedTemp by remember {
         mutableStateOf(
@@ -74,7 +109,7 @@ fun SettingsScreen() {
     Log.i("WTAG", "aboveSettingsScreen: $selectedWindSpeed")
 
 
-    var selectedLocation by remember { mutableStateOf("GPS") }
+    var selectedLocation by remember {mutableStateOf(viewModel.fetchData(SharedKeys.LOCATION.toString(),"Map")) }
 
     Column(
         modifier = Modifier
@@ -164,6 +199,28 @@ fun SettingsScreen() {
         SettingToggle(stringResource(R.string.n), listOf(stringResource(R.string.gps), stringResource(R.string.map)), selectedLocation,viewModel) {
             selectedLocation = it
             viewModel.saveData(SharedKeys.LOCATION.toString(),it)
+            if (it=="Map"||it=="الخريطة")
+            {
+                onMapClicked()
+            }
+            else
+            {
+                if (permissionState.value)
+                {
+                    if (!isLocationEnabled(context))
+                    {
+                        openLocationSettings(context)
+                    }
+                    else
+                    {
+                        context.getGpsLocation { viewModel.saveGpsLocation(it) }
+                    }
+                }
+                else{
+                    launcher.launch(permission)
+                }
+
+            }
         }
     }
 }
@@ -202,4 +259,13 @@ fun SettingToggle(title: String, options: List<String>, selected: String,viewMod
             }
         }
     }
+}
+
+private fun isLocationEnabled(context: Context): Boolean {
+    val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+}
+private fun openLocationSettings(context: Context) {
+    val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+    context.startActivity(intent)
 }

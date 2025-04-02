@@ -9,6 +9,7 @@ import com.google.gson.reflect.TypeToken
 
 @TypeConverters(Converters::class)
 @Entity(tableName = "weather_table")
+
 data class WeatherResult(
     @PrimaryKey val id: Int,
     val base: String,
@@ -109,4 +110,26 @@ class Converters {
     @TypeConverter
     fun toWind(windString: String): WeatherResult.Wind =
         Gson().fromJson(windString, WeatherResult.Wind::class.java)
+
+    @TypeConverter
+    fun fromWeatherResult(weatherResult: WeatherResult?): String {
+        return Gson().toJson(weatherResult)
+    }
+
+    @TypeConverter
+    fun toWeatherResult(data: String): WeatherResult {
+        val type = object : TypeToken<WeatherResult>() {}.type
+        return Gson().fromJson(data, type)
+    }
+
+    @TypeConverter
+    fun fromForeCastResult(foreCastResult: ForeCastResult?): String {
+        return Gson().toJson(foreCastResult)
+    }
+
+    @TypeConverter
+    fun toForeCastResult(data: String): ForeCastResult {
+        val type = object : TypeToken<ForeCastResult>() {}.type
+        return Gson().fromJson(data, type)
+    }
 }

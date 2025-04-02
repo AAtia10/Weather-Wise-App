@@ -1,9 +1,12 @@
 package com.example.weatherwise.data.local
 
+import com.example.weatherwise.data.models.AlarmEntity
 import com.example.weatherwise.data.models.WeatherResult
+import com.example.weatherwise.data.models.dto.HomeForecastData
+import com.example.weatherwise.data.models.dto.HomeWeatherData
 import kotlinx.coroutines.flow.Flow
 
-class LocalDataSource private constructor(private val favoriteDao: FavoriteDao) {
+class LocalDataSource (private val favoriteDao: FavoriteDao) {
 
     suspend fun addFavorite(place: WeatherResult) {
         favoriteDao.insertFavorite(place)
@@ -21,6 +24,33 @@ class LocalDataSource private constructor(private val favoriteDao: FavoriteDao) 
     suspend fun deleteFavorite(place: WeatherResult) {
         favoriteDao.deleteFavorite(place)
     }
+
+
+    suspend fun insertAlarm(place: AlarmEntity)
+    {
+        favoriteDao.insertAlarm(place)
+    }
+
+
+    fun getAllAlarm(): Flow<List<AlarmEntity>>
+    {
+       return favoriteDao.getAllAlarm()
+    }
+
+
+    suspend fun deleteAlarm(place: AlarmEntity)
+    {
+        favoriteDao.deleteAlarm(place)
+    }
+
+    suspend fun insertHomeWeather(place:HomeWeatherData)=favoriteDao.insertHomeWeather(place)
+
+     fun getHomeWeather()=favoriteDao.getHomeWeather()
+
+    suspend fun insertHomeForecast(place:HomeForecastData)=favoriteDao.insertHomeForecast(place)
+    fun getHomeForecast()=favoriteDao.getHomeForecast()
+
+
 
     companion object {
         private var instance: LocalDataSource? = null

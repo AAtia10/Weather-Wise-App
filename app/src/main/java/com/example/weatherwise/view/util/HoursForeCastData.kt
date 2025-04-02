@@ -45,37 +45,3 @@ fun formatHourTime(timestamp: Long): String {
     return sdf.format(date)
 }
 
-val HourlyForecastData = listOf(
-    ForecastItem(
-        image = R.drawable.img_cloudy,
-        dayOfWeek = "10 AM",
-        date = "",
-        temperature = "24°",
-        airQuality = "Good",
-        airQualityIndicatorColorHex = "#2dbe8d"
-    ),
-    ForecastItem(
-        image = R.drawable.img_sun,
-        dayOfWeek = "11 AM",
-        date = "",
-        temperature = "26°",
-        airQuality = "Moderate",
-        airQualityIndicatorColorHex = "#f9cf5f"
-    ),
-    ForecastItem(
-        image = R.drawable.img_thunder,
-        dayOfWeek = "12 PM",
-        date = "",
-        temperature = "22°",
-        airQuality = "Unhealthy",
-        airQualityIndicatorColorHex = "#ff7676"
-    ),
-    ForecastItem(
-        image = R.drawable.img_rain,
-        dayOfWeek = "1 PM",
-        date = "",
-        temperature = "20°",
-        airQuality = "Good",
-        airQualityIndicatorColorHex = "#2dbe8d"
-    )
-)

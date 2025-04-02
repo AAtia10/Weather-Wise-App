@@ -23,13 +23,15 @@ fun SetupNavHost(navController: NavHostController = rememberNavController()) {
             HomeScreen()
         }
         composable<ScreenRoutes.SettingsScreen> {
-            SettingsScreen()
+            SettingsScreen(){
+                navController.navigate(ScreenRoutes.MapScreen(true))
+            }
         }
         composable<ScreenRoutes.FavouriteScreen> {
             FavouriteScreen(
                 navController = navController,
                 onAddClick = {
-                    navController.navigate(ScreenRoutes.MapScreen)
+                    navController.navigate(ScreenRoutes.MapScreen(false))
                 }
             )
         }
@@ -37,9 +39,11 @@ fun SetupNavHost(navController: NavHostController = rememberNavController()) {
             AlertScreen()
         }
         composable<ScreenRoutes.MapScreen> {
-            MapScreen {
+            val args:ScreenRoutes.MapScreen=it.toRoute()
+            val value=args.isComeFromSettings
+            MapScreen(value) {
                 navController.popBackStack()
-                navController.navigate(ScreenRoutes.FavouriteScreen)
+
             }
         }
         composable(

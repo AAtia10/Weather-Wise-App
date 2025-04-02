@@ -1,5 +1,10 @@
 package com.example.weatherwise.view.util
 
+import com.example.weatherwise.data.models.ForeCastResult
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+
 fun getTemperatureUnit(setting: String): String {
     return when {
         setting.contains("°F", ignoreCase = true)|| setting.contains("°ف", ignoreCase = true) -> "imperial"
@@ -47,4 +52,23 @@ fun getArabicWindUnit(apiUnit: String): String {
         "metric" -> "متر/ث"
         else -> "متر/ث"
     }
+}
+
+
+fun List<ForeCastResult.Item0>.getFirstForecastPerDay(): List<ForeCastResult.Item0> {
+    return this.groupBy { it.dt_txt.substring(0, 10) } // Group by date (YYYY-MM-DD)
+        .map { it.value.first() } // Take the first forecast of each day
+}
+
+
+fun Int.toDayOfWeek(): String {
+    val date = Date(this.toLong() * 1000) // Convert seconds to milliseconds
+    val format = SimpleDateFormat("EEE", Locale.getDefault()) // "Mon", "Tue", etc.
+    return format.format(date)
+}
+
+fun Int.toDayMonth(): String {
+    val date = Date(this.toLong() * 1000)
+    val format = SimpleDateFormat("dd MMM", Locale.getDefault()) // "13 Feb", "05 Jan", etc.
+    return format.format(date)
 }

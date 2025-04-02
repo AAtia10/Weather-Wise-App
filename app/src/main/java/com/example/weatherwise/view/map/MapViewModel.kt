@@ -4,8 +4,10 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.weatherwise.data.SharedKeys
 import com.example.weatherwise.data.models.WeatherResult
 import com.example.weatherwise.data.repo.WeatherRepo
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -37,6 +39,12 @@ class MapViewModel(private val repo: WeatherRepo) : ViewModel(){
 
 
         }
+    }
+
+    fun saveMapLocation(lalog:LatLng){
+        repo.saveData("Maplat",lalog.latitude)
+        repo.saveData("Maplog",lalog.longitude)
+
     }
 }
 

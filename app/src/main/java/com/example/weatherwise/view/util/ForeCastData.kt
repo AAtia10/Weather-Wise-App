@@ -2,6 +2,7 @@ package com.example.weatherwise.view.util
 
 import androidx.annotation.DrawableRes
 import com.example.weatherwise.R
+import com.example.weatherwise.data.models.ForeCastResult
 
 data class ForecastItem(
     @DrawableRes val image: Int,
@@ -13,62 +14,24 @@ data class ForecastItem(
 
 )
 
-val ForecastData = listOf(
-    ForecastItem(
-        image = R.drawable.img_cloudy,
-        dayOfWeek = "Mon",
-        date = "13 Feb",
-        temperature = "26°",
-        airQuality = "194",
-        airQualityIndicatorColorHex = "#ff7676"
-    ),
-    ForecastItem(
-        image = R.drawable.img_moon_stars,
-        dayOfWeek = "Tue",
-        date = "14 Feb",
-        temperature = "18°",
-        airQuality = "160",
-        airQualityIndicatorColorHex = "#ff7676",
+fun getForecastData(list:List<ForeCastResult.Item0>) : List<ForecastItem>{
+    val resultList : MutableList<ForecastItem> = mutableListOf()
 
-    ),
-    ForecastItem(
-        image = R.drawable.img_thunder,
-        dayOfWeek = "Wed",
-        date = "15 Feb",
-        temperature = "16°",
-        airQuality = "40",
-        airQualityIndicatorColorHex = "#2dbe8d"
-    ),
-    ForecastItem(
-        image = R.drawable.img_clouds,
-        dayOfWeek = "Thu",
-        date = "16 Feb",
-        temperature = "20°",
-        airQuality = "58",
-        airQualityIndicatorColorHex = "#f9cf5f"
-    ),
-    ForecastItem(
-        image = R.drawable.img_sun,
-        dayOfWeek = "Fri",
-        date = "17 Feb",
-        temperature = "34°",
-        airQuality = "121",
-        airQualityIndicatorColorHex = "#ff7676"
-    ),
-    ForecastItem(
-        image = R.drawable.img_rain,
-        dayOfWeek = "Sat",
-        date = "18 Feb",
-        temperature = "28°",
-        airQuality = "73",
-        airQualityIndicatorColorHex = "#f9cf5f"
-    ),
-    ForecastItem(
-        image = R.drawable.img_thunder,
-        dayOfWeek = "Sun",
-        date = "19 Feb",
-        temperature = "24°",
-        airQuality = "15",
-        airQualityIndicatorColorHex = "#2dbe8d"
-    )
-)
+    list.forEach {
+        resultList.add(
+            ForecastItem(
+                image = getWeatherIcon(it.weather.firstOrNull()?.main),
+                dayOfWeek =it.dt.toDayOfWeek() ,
+                date = it.dt.toDayMonth(),
+                temperature = formatNumberBasedOnLanguage("${it.main.temp.toInt()}°"),
+                airQuality = formatNumberBasedOnLanguage("${it.main.humidity} %"),
+                airQualityIndicatorColorHex = "#ff7676"
+            )
+        )
+
+    }
+
+    return resultList
+}
+
+

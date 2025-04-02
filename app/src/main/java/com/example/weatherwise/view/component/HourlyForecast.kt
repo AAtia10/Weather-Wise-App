@@ -30,9 +30,7 @@ import com.example.weatherwise.R
 import com.example.weatherwise.ui.theme.ColorGradient1
 import com.example.weatherwise.ui.theme.ColorGradient2
 import com.example.weatherwise.ui.theme.ColorTextPrimary
-import com.example.weatherwise.view.util.ForecastData
 import com.example.weatherwise.view.util.ForecastItem
-import com.example.weatherwise.view.util.HourlyForecastData
 import com.example.weatherwise.view.util.formatNumberBasedOnLanguage
 
 @Composable

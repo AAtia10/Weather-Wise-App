@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     kotlin("plugin.serialization") version "2.1.10"
     id("kotlin-kapt")
+
+
 }
 
 android {
@@ -20,6 +22,12 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+    }
+
+    packagingOptions {
+        exclude("META-INF/LICENSE-notice.md")
+        exclude("META-INF/LICENSE.md")
+        exclude("META-INF/LICENSE.txt")
     }
 
     buildTypes {
@@ -61,6 +69,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.play.services.location)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -95,6 +104,32 @@ dependencies {
     implementation("androidx.room:room-runtime:$room_version")
     implementation ("androidx.room:room-ktx:$room_version")
     kapt("androidx.room:room-compiler:$room_version")
+
+    //workmanger
+    implementation ("androidx.work:work-runtime-ktx:2.8.1")
+
+
+    androidTestImplementation ("io.mockk:mockk-android:1.13.17")
+    androidTestImplementation ("io.mockk:mockk-agent:1.13.17")
+
+    val androidXTestExtKotlinRunnerVersion by extra("1.1.3")
+    val androidXTestCoreVersion by extra("1.6.1")
+    val coroutinesVersion by extra("1.5.2")
+    testImplementation ("io.mockk:mockk-android:1.13.17")
+    testImplementation ("io.mockk:mockk-agent:1.13.17")
+
+    //kotlinx-coroutines
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion")
+    testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
+    androidTestImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
+    testImplementation(kotlin("test"))
+
+    // AndroidX and Robolectric
+    testImplementation ("androidx.test.ext:junit-ktx:$androidXTestExtKotlinRunnerVersion")
+    testImplementation ("androidx.test:core-ktx:$androidXTestCoreVersion")
+    testImplementation ("org.robolectric:robolectric:4.11")
+    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+
 
 
 

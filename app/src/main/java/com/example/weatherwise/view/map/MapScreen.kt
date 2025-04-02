@@ -26,8 +26,6 @@ import com.example.weatherwise.data.local.sharedPrefrence.SharedPrefrence
 import com.example.weatherwise.data.remote.RemoteDataSourceImpl
 import com.example.weatherwise.data.remote.Retrofit
 import com.example.weatherwise.data.repo.WeatherRepositoryImpl
-import com.example.weatherwise.view.home.HomeFactory
-import com.example.weatherwise.view.home.HomeViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -40,7 +38,7 @@ import kotlinx.coroutines.withContext
 import java.util.Locale
 
 @Composable
-fun MapScreen(navToFav: () -> Unit) {
+fun MapScreen(isComeFromSettings: Boolean, onBackClick: () -> Unit) {
 
 
     val context = LocalContext.current
@@ -72,8 +70,10 @@ fun MapScreen(navToFav: () -> Unit) {
     LaunchedEffect(insertedMsg) {
         insertedMsg?.let {
             if (it) {
-                Toast.makeText(context,
-                    context.getString(R.string.location_inserted_successfully), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.location_inserted_successfully), Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
@@ -147,9 +147,16 @@ fun MapScreen(navToFav: () -> Unit) {
             Button(onClick = {
                 val selectedAddress = cityState.value
                 val selectedLocation = markerPosition
-                Log.i("TAG", "MapScreen:$selectedAddress location $selectedLocation ")
-                mapViewModel.saveLocation(selectedLocation.latitude, selectedLocation.longitude)
-                navToFav()
+                if (isComeFromSettings) {
+                    mapViewModel.saveMapLocation(selectedLocation)
+                    onBackClick()
+
+                } else {
+                    Log.i("TAG", "MapScreen:$selectedAddress location $selectedLocation ")
+                    mapViewModel.saveLocation(selectedLocation.latitude, selectedLocation.longitude)
+                    onBackClick()
+                }
+
             }, modifier = Modifier.padding(horizontal = 16.dp)) {
                 Text(text = stringResource(R.string.select_location))
 

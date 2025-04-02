@@ -3,7 +3,6 @@ package com.example.weatherwise.view.component
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,19 +11,16 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -37,14 +33,12 @@ import com.example.weatherwise.R
 import com.example.weatherwise.ui.theme.ColorTextPrimary
 import com.example.weatherwise.ui.theme.ColorTextPrimaryVariant
 import com.example.weatherwise.ui.theme.ColorTextSecondary
-import com.example.weatherwise.ui.theme.ColorTextSecondaryVariant
-import com.example.weatherwise.view.util.ForecastData
 import com.example.weatherwise.view.util.ForecastItem
 
 @Composable
 fun WeeklyForecast(
     modifier: Modifier = Modifier,
-    data: List<ForecastItem> = ForecastData
+    data: List<ForecastItem>
 ) {
     Column(
         modifier = modifier,

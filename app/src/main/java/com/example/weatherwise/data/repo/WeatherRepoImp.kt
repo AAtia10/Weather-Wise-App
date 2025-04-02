@@ -5,10 +5,13 @@ import com.example.weatherwise.data.models.WeatherResult
 import com.example.weatherwise.data.remote.RemoteDataSource
 import com.example.weatherwise.data.local.LocalDataSource
 import com.example.weatherwise.data.local.sharedPrefrence.SharedPrefrence
+import com.example.weatherwise.data.models.AlarmEntity
+import com.example.weatherwise.data.models.dto.HomeForecastData
+import com.example.weatherwise.data.models.dto.HomeWeatherData
 
 import kotlinx.coroutines.flow.Flow
 
-class WeatherRepositoryImpl private constructor(
+class WeatherRepositoryImpl (
     private val remoteDataSource: RemoteDataSource,
     private val localDataSource: LocalDataSource,
     private val sharedP:SharedPrefrence
@@ -46,6 +49,33 @@ class WeatherRepositoryImpl private constructor(
     override fun <T> fetchData(key: String, defaultValue: T): T {
         return sharedP.fetchData(key,defaultValue)
     }
+
+    override suspend fun insertAlarm(place: AlarmEntity)
+    {
+        localDataSource.insertAlarm(place)
+    }
+
+
+    override fun getAllAlarm(): Flow<List<AlarmEntity>>
+    {
+        return localDataSource.getAllAlarm()
+    }
+
+
+    override suspend fun deleteAlarm(place: AlarmEntity)
+    {
+        localDataSource.deleteAlarm(place)
+    }
+
+    override suspend fun insertHomeWeather(place:HomeWeatherData)=localDataSource.insertHomeWeather(place)
+    override suspend fun insertHomeForecast(place: HomeForecastData) =localDataSource.insertHomeForecast(place)
+
+
+
+    override fun getHomeWeather()=localDataSource.getHomeWeather()
+    override fun getHomeForecast(): Flow<HomeForecastData> =localDataSource.getHomeForecast()
+
+
 
     companion object {
         @Volatile

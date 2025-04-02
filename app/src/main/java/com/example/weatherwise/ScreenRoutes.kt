@@ -22,7 +22,7 @@ sealed class ScreenRoutes {
     object AlertScreen : ScreenRoutes()
 
     @Serializable
-    object MapScreen : ScreenRoutes()
+    data class MapScreen(val isComeFromSettings:Boolean) : ScreenRoutes()
 
     @Serializable
     object FavouriteDetailScreen : ScreenRoutes() {
