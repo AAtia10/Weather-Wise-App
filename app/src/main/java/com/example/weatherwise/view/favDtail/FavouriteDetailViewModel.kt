@@ -53,7 +53,7 @@ class FavouriteDetailViewModel(private val repo: WeatherRepo) : ViewModel() {
 
     private fun fetchForecast(lat: Double, lon: Double) {
         if (!ConnectivityObserver.isConnected.value) {
-            _errorMessage.value = "No internet connection - showing cached data"
+            _errorMessage.value = "No internet connection "
             _isLoading.value = false
             return
         }

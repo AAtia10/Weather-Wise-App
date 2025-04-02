@@ -4,8 +4,11 @@ import android.content.Context
 import android.location.Geocoder
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
+import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -30,6 +33,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -39,131 +43,174 @@ import java.util.Locale
 
 @Composable
 fun MapScreen(isComeFromSettings: Boolean, onBackClick: () -> Unit) {
-
-
     val context = LocalContext.current
     val mapViewModel: MapViewModel = viewModel(
         factory = MapViewModelFactory(
-            WeatherRepositoryImpl
-                .getInstance
-                    (
-                    RemoteDataSourceImpl(Retrofit.service),
-                    LocalDataSource.getInstance(
-                        WeatherDatabase.getInstance(context).favoriteDao()
-                    ),
-                    SharedPrefrence.getInstance(context)
-                )
+            WeatherRepositoryImpl.getInstance(
+                RemoteDataSourceImpl(Retrofit.service),
+                LocalDataSource.getInstance(
+                    WeatherDatabase.getInstance(context).favoriteDao()
+                ),
+                SharedPrefrence.getInstance(context)
+            )
         )
     )
+
     val insertedMsg by mapViewModel.inserted.collectAsStateWithLifecycle()
-    val cityState = remember {
-        mutableStateOf("")
-    }
+    val cityState = remember { mutableStateOf("") }
     var searchQuery by remember { mutableStateOf("") }
     var markerPosition by remember { mutableStateOf(LatLng(31.12, 29.57)) }
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(markerPosition, 10f)
     }
 
-    val searchFlow = remember { MutableSharedFlow<String>() }
+    // State for search recommendations
+    val recommendations by mapViewModel.recommendations.collectAsStateWithLifecycle()
+    var showRecommendations by remember { mutableStateOf(false) }
 
     LaunchedEffect(insertedMsg) {
         insertedMsg?.let {
             if (it) {
                 Toast.makeText(
                     context,
-                    context.getString(R.string.location_inserted_successfully), Toast.LENGTH_SHORT
+                    context.getString(R.string.location_inserted_successfully),
+                    Toast.LENGTH_SHORT
                 ).show()
             }
         }
-
     }
 
-    LaunchedEffect(Unit) {
-        searchFlow.collect { query ->
-            val latLng = getLatLngFromAddress(context, query)
-            if (latLng != null) {
-                markerPosition = latLng
-                cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(latLng, 10f))
-            }
+    LaunchedEffect(searchQuery) {
+        if (searchQuery.length >= 3) {
+            mapViewModel.getLocationRecommendations(searchQuery, context)
+            showRecommendations = true
+        } else {
+            showRecommendations = false
         }
     }
+
     LaunchedEffect(markerPosition) {
         val address = getAddressFromLocation(markerPosition, context)
         if (!address.isNullOrEmpty()) {
             cityState.value = address
         }
-
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
-    ) {
+            .padding(16.dp))
+            {
+                // Search field with recommendations
+                Box {
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = {
+                            searchQuery = it
+                        },
+                        label = { Text(stringResource(R.string.search_location)) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
 
-        OutlinedTextField(
-            value = searchQuery,
-            onValueChange = {
-                searchQuery = it
-                GlobalScope.launch { searchFlow.emit(it) }
-            },
-            label = { Text(stringResource(R.string.search_location)) },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-
-        Box(modifier = Modifier.weight(1f)) {
-            GoogleMap(
-                modifier = Modifier.fillMaxSize(),
-                cameraPositionState = cameraPositionState,
-                onMapClick = { latLng ->
-                    markerPosition = latLng
-
-                }
-            ) {
-                Marker(
-                    state = MarkerState(position = markerPosition),
-                    title = stringResource(R.string.selected_location),
-                    snippet = "Lat: ${markerPosition.latitude}, Lng: ${markerPosition.longitude}"
-                )
-            }
-        }
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-
-            Text(
-                text = cityState.value, fontSize = 14.sp, color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold, modifier = Modifier.padding(4.dp)
-            )
-
-            Button(onClick = {
-                val selectedAddress = cityState.value
-                val selectedLocation = markerPosition
-                if (isComeFromSettings) {
-                    mapViewModel.saveMapLocation(selectedLocation)
-                    onBackClick()
-
-                } else {
-                    Log.i("TAG", "MapScreen:$selectedAddress location $selectedLocation ")
-                    mapViewModel.saveLocation(selectedLocation.latitude, selectedLocation.longitude)
-                    onBackClick()
+                    // Recommendations dropdown
+                    if (showRecommendations && recommendations.isNotEmpty()) {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 60.dp)
+                                .heightIn(max = 200.dp),
+                            contentPadding = PaddingValues(8.dp)
+                        ) {
+                            items(recommendations.size) { index ->
+                                val recommendation = recommendations[index]
+                                Text(
+                                    text = recommendation,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            searchQuery = recommendation
+                                            showRecommendations = false
+                                            CoroutineScope(Dispatchers.Main).launch {
+                                                try {
+                                                    val latLng = withContext(Dispatchers.IO) {
+                                                        getLatLngFromAddress(context, recommendation)
+                                                    }
+                                                    latLng?.let {
+                                                        markerPosition = it
+                                                        cameraPositionState.animate(
+                                                            CameraUpdateFactory.newLatLngZoom(it, 10f)
+                                                        )
+                                                    }
+                                                } catch (e: Exception) {
+                                                    Log.e("MapScreen", "Error animating camera: ${e.message}")
+                                                }
+                                            }
+                                        }
+                                        .padding(12.dp)
+                                )
+                                Divider()
+                            }
+                        }
+                    }
                 }
 
-            }, modifier = Modifier.padding(horizontal = 16.dp)) {
-                Text(text = stringResource(R.string.select_location))
+                Spacer(modifier = Modifier.height(16.dp))
 
+                Box(modifier = Modifier.weight(1f)) {
+                    GoogleMap(
+                        modifier = Modifier.fillMaxSize(),
+                        cameraPositionState = cameraPositionState,
+                        onMapClick = { latLng ->
+                            markerPosition = latLng
+                        }
+                    ) {
+                        Marker(
+                            state = MarkerState(position = markerPosition),
+                            title = stringResource(R.string.selected_location),
+                            snippet = "Lat: ${markerPosition.latitude}, Lng: ${markerPosition.longitude}"
+                        )
+                    }
+                }
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = cityState.value,
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(4.dp)
+                    )
+
+                    Button(
+                        onClick = {
+                            val selectedAddress = cityState.value
+                            val selectedLocation = markerPosition
+                            if (isComeFromSettings) {
+                                mapViewModel.saveMapLocation(selectedLocation)
+                                onBackClick()
+                            } else {
+                                mapViewModel.saveLocation(
+                                    selectedLocation.latitude,
+                                    selectedLocation.longitude
+                                )
+                                onBackClick()
+                            }
+                        },
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    ) {
+                        Text(text = stringResource(R.string.select_location))
+                    }
+                }
             }
-        }
-    }
 }
+
+
+
 
 
 private suspend fun getLatLngFromAddress(context: Context, address: String): LatLng? {
@@ -184,19 +231,16 @@ private suspend fun getLatLngFromAddress(context: Context, address: String): Lat
     }
 }
 
-fun getAddressFromLocation(location: LatLng, context: Context): String {
+private fun getAddressFromLocation(location: LatLng, context: Context): String {
     val geocoder = Geocoder(context, Locale.getDefault())
     return try {
         val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
         if (!addresses.isNullOrEmpty()) {
             val address = addresses[0]
-
-            // Extract key details
             val city = address.locality ?: ""
             val state = address.adminArea ?: ""
             val country = address.countryName ?: ""
 
-            // Format the result professionally
             listOf(city, state, country)
                 .filter { it.isNotEmpty() }
                 .joinToString(", ")
