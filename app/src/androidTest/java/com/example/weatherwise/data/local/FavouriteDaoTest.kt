@@ -24,13 +24,46 @@ class FavouriteDaoTest {
     private lateinit var db: WeatherDatabase
     private lateinit var currentWeatherResponse: WeatherResult
     private lateinit var forecast: ForeCastResult
-//    val cloud = mockk<WeatherResult.Clouds>()
-//    val coord = mockk<WeatherResult.Coord>()
-//    val main = mockk<WeatherResult.Main>()
-//    val sys = mockk<WeatherResult.Sys>()
-//    val weather = mockk<WeatherResult.Weather>()
-//    val wind = mockk<WeatherResult.Wind>()
 
+    val weather1 = WeatherResult(
+        id = 1,
+        name = "Cairo",
+        base = "m",
+        clouds = WeatherResult.Clouds(all = 10),
+        cod = 200,
+        coord = WeatherResult.Coord(lat = 30.0, lon = 31.0),
+        dt = 1680300000,
+        main = WeatherResult.Main(
+            temp = 25.0, temp_min = 20.0, temp_max = 30.0,
+            feels_like = 26.0, pressure = 1012, humidity = 50,
+            sea_level = 1012, grnd_level = 1000
+        ),
+        sys = WeatherResult.Sys(country = "EG", sunrise = 1680250000, sunset = 1680300000),
+        timezone = 7200,
+        visibility = 10000,
+        weather = listOf(),
+        wind = WeatherResult.Wind(deg = 180, gust = 10.0, speed = 5.0)
+    )
+
+    val weather2 = WeatherResult(
+        id = 2,
+        name = "London",
+        base = "m",
+        clouds = WeatherResult.Clouds(all = 90),
+        cod = 200,
+        coord = WeatherResult.Coord(lat = 51.5, lon = -0.12),
+        dt = 1680300000,
+        main = WeatherResult.Main(
+            temp = 15.0, temp_min = 10.0, temp_max = 18.0,
+            feels_like = 14.0, pressure = 1015, humidity = 80,
+            sea_level = 1015, grnd_level = 1005
+        ),
+        sys = WeatherResult.Sys(country = "GB", sunrise = 1680250000, sunset = 1680300000),
+        timezone = 0,
+        visibility = 8000,
+        weather = listOf(),
+        wind = WeatherResult.Wind(deg = 200, gust = 15.0, speed = 7.0)
+    )
 
 
     @Before
@@ -54,94 +87,6 @@ class FavouriteDaoTest {
     @Test
     fun getAllFavorites()= runTest {
 
-//       val weatherList = listOf(
-//            WeatherResult(
-//                clouds = cloud,
-//                cod = 2950,
-//                coord = coord,
-//                dt = 2571,
-//                id = 1,
-//                main = main,
-//                name = "cairo",
-//                sys = sys,
-//                timezone = 3957,
-//                visibility = 1961,
-//                weather = listOf(),
-//                wind = wind,
-//                base = "m",
-//            ),
-//            WeatherResult(
-//                clouds = cloud,
-//                cod = 2950,
-//                coord = coord,
-//                dt = 2571,
-//                id = 2,
-//                main = main,
-//                name = "assuit",
-//                sys = sys,
-//                timezone = 3957,
-//                visibility = 1961,
-//                weather = listOf(),
-//                wind = wind,
-//                base = "m",
-//            ),
-//            WeatherResult(
-//                clouds = cloud,
-//                cod = 2950,
-//                coord = coord,
-//                dt = 2571,
-//                id = 3,
-//                main = main,
-//                name = "alex",
-//                sys = sys,
-//                timezone = 3957,
-//                visibility = 1961,
-//                weather = listOf(),
-//                wind = wind,
-//                base = "m",
-//            )
-//        )
-
-        val weather1 = WeatherResult(
-            id = 1,
-            name = "Cairo",
-            base = "m",
-            clouds = WeatherResult.Clouds(all = 10),
-            cod = 200,
-            coord = WeatherResult.Coord(lat = 30.0, lon = 31.0),
-            dt = 1680300000,
-            main = WeatherResult.Main(
-                temp = 25.0, temp_min = 20.0, temp_max = 30.0,
-                feels_like = 26.0, pressure = 1012, humidity = 50,
-                sea_level = 1012, grnd_level = 1000
-            ),
-            sys = WeatherResult.Sys(country = "EG", sunrise = 1680250000, sunset = 1680300000),
-            timezone = 7200,
-            visibility = 10000,
-            weather = listOf(),
-            wind = WeatherResult.Wind(deg = 180, gust = 10.0, speed = 5.0)
-        )
-
-        val weather2 = WeatherResult(
-            id = 2,
-            name = "London",
-            base = "m",
-            clouds = WeatherResult.Clouds(all = 90),
-            cod = 200,
-            coord = WeatherResult.Coord(lat = 51.5, lon = -0.12),
-            dt = 1680300000,
-            main = WeatherResult.Main(
-                temp = 15.0, temp_min = 10.0, temp_max = 18.0,
-                feels_like = 14.0, pressure = 1015, humidity = 80,
-                sea_level = 1015, grnd_level = 1005
-            ),
-            sys = WeatherResult.Sys(country = "GB", sunrise = 1680250000, sunset = 1680300000),
-            timezone = 0,
-            visibility = 8000,
-            weather = listOf(),
-            wind = WeatherResult.Wind(deg = 200, gust = 15.0, speed = 7.0)
-        )
-
 
         dao.insertFavorite(weather1)
         dao.insertFavorite(weather2)
@@ -152,45 +97,8 @@ class FavouriteDaoTest {
     }
     @Test
     fun getFavoriteById()= runTest {
-        val weather1 = WeatherResult(
-            id = 1,
-            name = "Cairo",
-            base = "m",
-            clouds = WeatherResult.Clouds(all = 10),
-            cod = 200,
-            coord = WeatherResult.Coord(lat = 30.0, lon = 31.0),
-            dt = 1680300000,
-            main = WeatherResult.Main(
-                temp = 25.0, temp_min = 20.0, temp_max = 30.0,
-                feels_like = 26.0, pressure = 1012, humidity = 50,
-                sea_level = 1012, grnd_level = 1000
-            ),
-            sys = WeatherResult.Sys(country = "EG", sunrise = 1680250000, sunset = 1680300000),
-            timezone = 7200,
-            visibility = 10000,
-            weather = listOf(),
-            wind = WeatherResult.Wind(deg = 180, gust = 10.0, speed = 5.0)
-        )
 
-        val weather2 = WeatherResult(
-            id = 2,
-            name = "London",
-            base = "m",
-            clouds = WeatherResult.Clouds(all = 90),
-            cod = 200,
-            coord = WeatherResult.Coord(lat = 51.5, lon = -0.12),
-            dt = 1680300000,
-            main = WeatherResult.Main(
-                temp = 15.0, temp_min = 10.0, temp_max = 18.0,
-                feels_like = 14.0, pressure = 1015, humidity = 80,
-                sea_level = 1015, grnd_level = 1005
-            ),
-            sys = WeatherResult.Sys(country = "GB", sunrise = 1680250000, sunset = 1680300000),
-            timezone = 0,
-            visibility = 8000,
-            weather = listOf(),
-            wind = WeatherResult.Wind(deg = 200, gust = 15.0, speed = 7.0)
-        )
+
         dao.insertFavorite(weather1)
         dao.insertFavorite(weather2)
         val favorite = dao.getFavoriteById(2).firstOrNull()
@@ -200,46 +108,7 @@ class FavouriteDaoTest {
     }
     @Test
     fun deleteFavorite()= runTest {
-
-        val weather1 = WeatherResult(
-            id = 1,
-            name = "Cairo",
-            base = "m",
-            clouds = WeatherResult.Clouds(all = 10),
-            cod = 200,
-            coord = WeatherResult.Coord(lat = 30.0, lon = 31.0),
-            dt = 1680300000,
-            main = WeatherResult.Main(
-                temp = 25.0, temp_min = 20.0, temp_max = 30.0,
-                feels_like = 26.0, pressure = 1012, humidity = 50,
-                sea_level = 1012, grnd_level = 1000
-            ),
-            sys = WeatherResult.Sys(country = "EG", sunrise = 1680250000, sunset = 1680300000),
-            timezone = 7200,
-            visibility = 10000,
-            weather = listOf(),
-            wind = WeatherResult.Wind(deg = 180, gust = 10.0, speed = 5.0)
-        )
-
-        val weather2 = WeatherResult(
-            id = 2,
-            name = "London",
-            base = "m",
-            clouds = WeatherResult.Clouds(all = 90),
-            cod = 200,
-            coord = WeatherResult.Coord(lat = 51.5, lon = -0.12),
-            dt = 1680300000,
-            main = WeatherResult.Main(
-                temp = 15.0, temp_min = 10.0, temp_max = 18.0,
-                feels_like = 14.0, pressure = 1015, humidity = 80,
-                sea_level = 1015, grnd_level = 1005
-            ),
-            sys = WeatherResult.Sys(country = "GB", sunrise = 1680250000, sunset = 1680300000),
-            timezone = 0,
-            visibility = 8000,
-            weather = listOf(),
-            wind = WeatherResult.Wind(deg = 200, gust = 15.0, speed = 7.0)
-        )
+        
         dao.insertFavorite(weather1)
         dao.insertFavorite(weather2)
         dao.deleteFavorite(weather2)

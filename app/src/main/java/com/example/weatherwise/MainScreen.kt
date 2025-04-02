@@ -22,12 +22,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.rememberNavController
-import com.example.weatherwise.NavItem
-import com.example.weatherwise.view.Alert.AlertScreen
-import com.example.weatherwise.view.favourite.FavouriteScreen
-import com.example.weatherwise.view.home.HomeScreen
-import com.example.weatherwise.view.home.HomeViewModel
-import com.example.weatherwise.view.settings.SettingsScreen
 
 @Composable
 fun MainScreen() {

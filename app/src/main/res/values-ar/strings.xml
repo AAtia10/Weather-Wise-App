@@ -38,4 +38,19 @@
     <string name="k">°ك</string>
     <string name="meter_s">متر/ث</string>
     <string name="mile_h">ميل/س</string>
+    <string name="set_alarm_duration">تحديد مدة المنبه</string>
+    <string name="select_start_time">اختر وقت البدء</string>
+    <string name="select_end_time">اختر وقت الانتهاء</string>
+    <string name="tap_the_button_to_add_your_first_alarm">اضغط على الزر + لإضافة أول منبه لك</string>
+    <string name="no_alarms_set">لم يتم ضبط أي منبهات</string>
+    <string name="save">حفظ</string>
+    <string name="cancel">إلغاء</string>
+    <string name="weather_update">تحديث الطقس</string>
+    <string name="end_time">وقت الانتهاء:</string>
+    <string name="start_time">وقت البدء:</string>
+    <string name="alarm_set">تم تعيين المنبه</string>
+
+
+
+
 </resources>

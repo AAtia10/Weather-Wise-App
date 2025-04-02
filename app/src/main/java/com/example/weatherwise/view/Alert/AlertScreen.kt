@@ -46,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -53,6 +54,11 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.work.WorkManager
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.weatherwise.R
 import com.example.weatherwise.data.local.LocalDataSource
 import com.example.weatherwise.data.local.WeatherDatabase
@@ -65,6 +71,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import com.example.weatherwise.ui.theme.ColorGradient3
+import com.example.weatherwise.view.util.formatNumberBasedOnLanguage
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 
@@ -92,17 +99,21 @@ fun AlertScreen(modifier: Modifier = Modifier) {
     }
 
     Box(modifier = modifier.fillMaxSize()) {
-        PrintAlarms(alarmEntity = alarms) {
-            alertViewModel.deleteAlarm(it)
-            WorkManager.getInstance(context).cancelAllWorkByTag(it.id)
-            
+        if (alarms.isEmpty()) {
+            EmptyAlarmsState()
+        } else {
+            PrintAlarms(alarmEntity = alarms) {
+                alertViewModel.deleteAlarm(it)
+                WorkManager.getInstance(context).cancelAllWorkByTag(it.id)
+            }
         }
+
         FloatingActionButton(
             onClick = { showDialog = true },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp),
-            containerColor =  MaterialTheme.colorScheme.primary
+            containerColor = MaterialTheme.colorScheme.primary
         ) {
             Icon(imageVector = Icons.Default.Add, contentDescription = "Add Alarm", tint = Color.White)
         }
@@ -111,7 +122,7 @@ fun AlertScreen(modifier: Modifier = Modifier) {
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text("Set Alarm Duration") },
+            title = { Text(stringResource(R.string.set_alarm_duration)) },
             text = {
                 Column {
                     Button(onClick = {
@@ -119,10 +130,14 @@ fun AlertScreen(modifier: Modifier = Modifier) {
                             startTime = LocalTime.of(hour, minute)
                         }
                     },colors = ButtonDefaults.buttonColors(containerColor = ColorGradient3)) {
-                        Text("Select Start Time")
+                        Text(stringResource(R.string.select_start_time))
                     }
                     startTime?.let {
-                        Text("Start Time: ${it.hour}:${it.minute}")
+                        Text(
+                            text = stringResource(R.string.start_time) + " " +
+                                    "${formatNumberBasedOnLanguage(it.hour.toString())}:${formatNumberBasedOnLanguage(it.minute.toString())}"
+                        )
+
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -132,10 +147,14 @@ fun AlertScreen(modifier: Modifier = Modifier) {
                             endTime = LocalTime.of(hour, minute)
                         }
                     },colors = ButtonDefaults.buttonColors(containerColor = ColorGradient3)) {
-                        Text("Select End Time")
+                        Text(stringResource(R.string.select_end_time))
                     }
                     endTime?.let {
-                        Text("End Time: ${it.hour}:${it.minute}")
+                        Text(
+                            stringResource(
+                                R.string.end_time) + " " +
+                                    "${formatNumberBasedOnLanguage(it.hour.toString())}:${formatNumberBasedOnLanguage(it.minute.toString())}"
+                            )
                     }
                 }
             },
@@ -149,7 +168,8 @@ fun AlertScreen(modifier: Modifier = Modifier) {
                             val duration = endMillis - startMillis
 
                             if (startMillis <= nowMillis) {
-                                Toast.makeText(context, "Time must be in the future", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context,
+                                    context.getString(R.string.time_must_be_in_the_future), Toast.LENGTH_SHORT).show()
                             } else {
                                 Log.i("TAG", "AlertScreen: $startMillis+${startMillis.toInt()}")
                                 alertViewModel.insertAlarm(
@@ -168,15 +188,20 @@ fun AlertScreen(modifier: Modifier = Modifier) {
                             Toast.makeText(context, "Please select both start and end times", Toast.LENGTH_SHORT).show()
                         }
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Green)
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF2E7D32)
+                    )
+
                 ) {
-                    Text("Save", color = Color.White)
+                    Text(stringResource(R.string.save), color = Color.White)
                 }
             },
 
             dismissButton = {
-                Button(onClick = { showDialog = false }, colors = ButtonDefaults.buttonColors(containerColor = Color.Red)) {
-                    Text("Cancel", color = Color.White)
+                Button(onClick = { showDialog = false }, colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFC62828)
+                )) {
+                    Text(stringResource(R.string.cancel), color = Color.White)
                 }
             }
         )
@@ -224,14 +249,14 @@ fun PrintAlarms(alarmEntity: List<AlarmEntity>, onDelete: (AlarmEntity) -> Unit)
                 ) {
                     Column {
                         Text(
-                            text = "Alarm Set",
+                            text = stringResource(R.string.alarm_set),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Bold
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = formatDateTime(alarm.time),
+                            text = formatNumberBasedOnLanguage(formatDateTime(alarm.time)) ,
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onSurface
@@ -240,12 +265,12 @@ fun PrintAlarms(alarmEntity: List<AlarmEntity>, onDelete: (AlarmEntity) -> Unit)
 
                     IconButton(
                         onClick = { onDelete(alarm) },
-                        modifier = Modifier.size(40.dp) // Larger touch target
+                        modifier = Modifier.size(40.dp)
                     ) {
                         Image(
-                            painter = painterResource(id = R.drawable.deletee), // Replace with your icon
+                            painter = painterResource(id = R.drawable.deletee),
                             contentDescription = "Delete Alarm",
-                            modifier = Modifier.size(28.dp) // Increased size for better visibility
+                            modifier = Modifier.size(28.dp)
                         )
                     }
                 }
@@ -263,3 +288,33 @@ fun formatDateTime(timestamp: Long): String {
         .format(formatter)
 }
 
+@Composable
+fun EmptyAlarmsState() {
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.alert))
+    val progress by animateLottieCompositionAsState(
+        composition = composition,
+        iterations = LottieConstants.IterateForever
+    )
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        LottieAnimation(
+            composition = composition,
+            progress = { progress },
+            modifier = Modifier.size(200.dp)
+        )
+        Text(
+            text = stringResource(R.string.no_alarms_set),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(top = 16.dp)
+        )
+        Text(
+            text = stringResource(R.string.tap_the_button_to_add_your_first_alarm),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+        )
+    }
+}
