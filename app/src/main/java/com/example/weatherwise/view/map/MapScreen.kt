@@ -188,7 +188,6 @@ fun MapScreen(isComeFromSettings: Boolean, onBackClick: () -> Unit) {
 
                     Button(
                         onClick = {
-                            val selectedAddress = cityState.value
                             val selectedLocation = markerPosition
                             if (isComeFromSettings) {
                                 mapViewModel.saveMapLocation(selectedLocation)

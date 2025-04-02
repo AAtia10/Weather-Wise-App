@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.Locale
 
 class MapViewModel(private val repo: WeatherRepo) : ViewModel() {
@@ -75,31 +74,8 @@ class MapViewModel(private val repo: WeatherRepo) : ViewModel() {
         }
     }
 
-    fun searchForLocation(query: String, context: Context, onResult: (LatLng?) -> Unit) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val geocoder = Geocoder(context, Locale.getDefault())
-                val addresses = geocoder.getFromLocationName(query, 1)
 
-                if (!addresses.isNullOrEmpty()) {
-                    val location = addresses[0]
-                    val latLng = LatLng(location.latitude, location.longitude)
-                    withContext(Dispatchers.Main) {
-                        onResult(latLng)
-                    }
-                } else {
-                    withContext(Dispatchers.Main) {
-                        onResult(null)
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e("MapViewModel", "Error searching location: ${e.message}")
-                withContext(Dispatchers.Main) {
-                    onResult(null)
-                }
-            }
-        }
-    }
+
 }
 
 class MapViewModelFactory(private val repo: WeatherRepo) : ViewModelProvider.Factory {
