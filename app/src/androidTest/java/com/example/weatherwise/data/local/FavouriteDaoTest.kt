@@ -108,7 +108,7 @@ class FavouriteDaoTest {
     }
     @Test
     fun deleteFavorite()= runTest {
-        
+
         dao.insertFavorite(weather1)
         dao.insertFavorite(weather2)
         dao.deleteFavorite(weather2)

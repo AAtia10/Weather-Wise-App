@@ -4,8 +4,7 @@ import android.location.Location
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.weatherwise.data.repo.WeatherRepo
-import com.example.weatherwise.view.home.HomeViewModel
-import com.google.android.gms.maps.model.LatLng
+
 
 class SettingsViewModel (private val repo: WeatherRepo) : ViewModel() {
 
